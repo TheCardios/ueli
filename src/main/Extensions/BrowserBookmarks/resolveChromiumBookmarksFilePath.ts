@@ -22,15 +22,7 @@ export const resolveChromiumBookmarksFilePath = ({
         "Brave Browser": {
             Linux: () => "", // not supported
             macOS: () => join(app.getPath("appData"), "BraveSoftware", "Brave-Browser"),
-            Windows: () =>
-                join(
-                    app.getPath("home"),
-                    "AppData",
-                    "Local",
-                    "BraveSoftware",
-                    "Brave-Browser",
-                    "User Data",
-                ),
+            Windows: () => join(app.getPath("home"), "AppData", "Local", "BraveSoftware", "Brave-Browser", "User Data"),
         },
         "Google Chrome": {
             Linux: () => "", // not supported
@@ -45,15 +37,7 @@ export const resolveChromiumBookmarksFilePath = ({
         "Yandex Browser": {
             Linux: () => "", // not supported
             macOS: () => join(app.getPath("appData"), "Yandex", "YandexBrowser"),
-            Windows: () =>
-                join(
-                    app.getPath("home"),
-                    "AppData",
-                    "Local",
-                    "Yandex",
-                    "YandexBrowser",
-                    "User Data",
-                ),
+            Windows: () => join(app.getPath("home"), "AppData", "Local", "Yandex", "YandexBrowser", "User Data"),
         },
     };
 
@@ -63,6 +47,7 @@ export const resolveChromiumBookmarksFilePath = ({
 
     try {
         const localState = JSON.parse(readFileSync(join(userDataPath, "Local State"), "utf-8"));
+
         if (localState.profile && typeof localState.profile.last_used === "string") {
             profile = localState.profile.last_used;
         }

@@ -1,17 +1,18 @@
 import type { App } from "electron";
+import type * as fs from "fs";
 import { join } from "path";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { resolveChromiumBookmarksFilePath } from "./resolveChromiumBookmarksFilePath";
 
 const readFileSyncMock = vi.fn();
 
 vi.mock("fs", async (importOriginal) => {
-    const original = await importOriginal<typeof import("fs")>();
+    const original = await importOriginal<typeof fs>();
     return {
         ...original,
         readFileSync: (path: string, encoding: BufferEncoding) => readFileSyncMock(path, encoding),
     };
 });
-import { resolveChromiumBookmarksFilePath } from "./resolveChromiumBookmarksFilePath";
 
 describe(resolveChromiumBookmarksFilePath, () => {
     const getPathMock = vi.fn();
@@ -26,9 +27,9 @@ describe(resolveChromiumBookmarksFilePath, () => {
         getPathMock.mockImplementationOnce(() => "home");
         readFileSyncMock.mockImplementationOnce(() => JSON.stringify({ profile: { last_used: "Default" } }));
 
-        expect(
-            resolveChromiumBookmarksFilePath({ browser: "Google Chrome", app, operatingSystem: "Windows" }),
-        ).toBe(join("home", "AppData", "Local", "Google", "Chrome", "User Data", "Default", "Bookmarks"));
+        expect(resolveChromiumBookmarksFilePath({ browser: "Google Chrome", app, operatingSystem: "Windows" })).toBe(
+            join("home", "AppData", "Local", "Google", "Chrome", "User Data", "Default", "Bookmarks"),
+        );
 
         expect(getPathMock).toHaveBeenCalledWith("home");
     });
@@ -37,9 +38,9 @@ describe(resolveChromiumBookmarksFilePath, () => {
         getPathMock.mockImplementationOnce(() => "appData");
         readFileSyncMock.mockImplementationOnce(() => JSON.stringify({ profile: { last_used: "Default" } }));
 
-        expect(
-            resolveChromiumBookmarksFilePath({ browser: "Google Chrome", app, operatingSystem: "macOS" }),
-        ).toBe(join("appData", "Google", "Chrome", "Default", "Bookmarks"));
+        expect(resolveChromiumBookmarksFilePath({ browser: "Google Chrome", app, operatingSystem: "macOS" })).toBe(
+            join("appData", "Google", "Chrome", "Default", "Bookmarks"),
+        );
 
         expect(getPathMock).toHaveBeenCalledWith("appData");
     });
@@ -49,9 +50,9 @@ describe(resolveChromiumBookmarksFilePath, () => {
 
         readFileSyncMock.mockImplementationOnce(() => JSON.stringify({ profile: { last_used: "Default" } }));
 
-        expect(
-            resolveChromiumBookmarksFilePath({ browser: "Microsoft Edge", app, operatingSystem: "Windows" }),
-        ).toBe(join("home", "AppData", "Local", "Microsoft", "Edge", "User Data", "Default", "Bookmarks"));
+        expect(resolveChromiumBookmarksFilePath({ browser: "Microsoft Edge", app, operatingSystem: "Windows" })).toBe(
+            join("home", "AppData", "Local", "Microsoft", "Edge", "User Data", "Default", "Bookmarks"),
+        );
 
         expect(getPathMock).toHaveBeenCalledWith("home");
     });
@@ -61,9 +62,9 @@ describe(resolveChromiumBookmarksFilePath, () => {
 
         readFileSyncMock.mockImplementationOnce(() => JSON.stringify({ profile: { last_used: "Default" } }));
 
-        expect(
-            resolveChromiumBookmarksFilePath({ browser: "Microsoft Edge", app, operatingSystem: "macOS" }),
-        ).toBe(join("appData", "Microsoft Edge", "Default", "Bookmarks"));
+        expect(resolveChromiumBookmarksFilePath({ browser: "Microsoft Edge", app, operatingSystem: "macOS" })).toBe(
+            join("appData", "Microsoft Edge", "Default", "Bookmarks"),
+        );
 
         expect(getPathMock).toHaveBeenCalledWith("appData");
     });
@@ -73,9 +74,9 @@ describe(resolveChromiumBookmarksFilePath, () => {
 
         readFileSyncMock.mockImplementationOnce(() => JSON.stringify({ profile: { last_used: "Default" } }));
 
-        expect(
-            resolveChromiumBookmarksFilePath({ browser: "Brave Browser", app, operatingSystem: "Windows" }),
-        ).toBe(join("home", "AppData", "Local", "BraveSoftware", "Brave-Browser", "User Data", "Default", "Bookmarks"));
+        expect(resolveChromiumBookmarksFilePath({ browser: "Brave Browser", app, operatingSystem: "Windows" })).toBe(
+            join("home", "AppData", "Local", "BraveSoftware", "Brave-Browser", "User Data", "Default", "Bookmarks"),
+        );
 
         expect(getPathMock).toHaveBeenCalledWith("home");
     });
@@ -85,9 +86,9 @@ describe(resolveChromiumBookmarksFilePath, () => {
 
         readFileSyncMock.mockImplementationOnce(() => JSON.stringify({ profile: { last_used: "Default" } }));
 
-        expect(
-            resolveChromiumBookmarksFilePath({ browser: "Brave Browser", app, operatingSystem: "macOS" }),
-        ).toBe(join("appData", "BraveSoftware", "Brave-Browser", "Default", "Bookmarks"));
+        expect(resolveChromiumBookmarksFilePath({ browser: "Brave Browser", app, operatingSystem: "macOS" })).toBe(
+            join("appData", "BraveSoftware", "Brave-Browser", "Default", "Bookmarks"),
+        );
 
         expect(getPathMock).toHaveBeenCalledWith("appData");
     });
@@ -97,9 +98,9 @@ describe(resolveChromiumBookmarksFilePath, () => {
 
         readFileSyncMock.mockImplementationOnce(() => JSON.stringify({ profile: { last_used: "Default" } }));
 
-        expect(
-            resolveChromiumBookmarksFilePath({ browser: "Yandex Browser", app, operatingSystem: "Windows" }),
-        ).toBe(join("home", "AppData", "Local", "Yandex", "YandexBrowser", "User Data", "Default", "Bookmarks"));
+        expect(resolveChromiumBookmarksFilePath({ browser: "Yandex Browser", app, operatingSystem: "Windows" })).toBe(
+            join("home", "AppData", "Local", "Yandex", "YandexBrowser", "User Data", "Default", "Bookmarks"),
+        );
 
         expect(getPathMock).toHaveBeenCalledWith("home");
     });
@@ -109,9 +110,9 @@ describe(resolveChromiumBookmarksFilePath, () => {
 
         readFileSyncMock.mockImplementationOnce(() => JSON.stringify({ profile: { last_used: "Default" } }));
 
-        expect(
-            resolveChromiumBookmarksFilePath({ browser: "Yandex Browser", app, operatingSystem: "macOS" }),
-        ).toBe(join("appData", "Yandex", "YandexBrowser", "Default", "Bookmarks"));
+        expect(resolveChromiumBookmarksFilePath({ browser: "Yandex Browser", app, operatingSystem: "macOS" })).toBe(
+            join("appData", "Yandex", "YandexBrowser", "Default", "Bookmarks"),
+        );
 
         expect(getPathMock).toHaveBeenCalledWith("appData");
     });
@@ -121,9 +122,9 @@ describe(resolveChromiumBookmarksFilePath, () => {
 
         readFileSyncMock.mockImplementationOnce(() => JSON.stringify({ profile: { last_used: "Default" } }));
 
-        expect(
-            resolveChromiumBookmarksFilePath({ browser: "Arc", app, operatingSystem: "Windows" }),
-        ).toBe(join("home", "AppData", "Local", "Arc", "User Data", "Default", "Bookmarks"));
+        expect(resolveChromiumBookmarksFilePath({ browser: "Arc", app, operatingSystem: "Windows" })).toBe(
+            join("home", "AppData", "Local", "Arc", "User Data", "Default", "Bookmarks"),
+        );
 
         expect(getPathMock).toHaveBeenCalledWith("home");
     });
@@ -133,9 +134,9 @@ describe(resolveChromiumBookmarksFilePath, () => {
 
         readFileSyncMock.mockImplementationOnce(() => JSON.stringify({ profile: { last_used: "Default" } }));
 
-        expect(
-            resolveChromiumBookmarksFilePath({ browser: "Arc", app, operatingSystem: "macOS" }),
-        ).toBe(join("appData", "Arc", "User Data", "Default", "Bookmarks"));
+        expect(resolveChromiumBookmarksFilePath({ browser: "Arc", app, operatingSystem: "macOS" })).toBe(
+            join("appData", "Arc", "User Data", "Default", "Bookmarks"),
+        );
 
         expect(getPathMock).toHaveBeenCalledWith("appData");
     });
@@ -144,8 +145,8 @@ describe(resolveChromiumBookmarksFilePath, () => {
         getPathMock.mockImplementationOnce(() => "home");
         readFileSyncMock.mockImplementationOnce(() => JSON.stringify({ profile: { last_used: "Profile 1" } }));
 
-        expect(
-            resolveChromiumBookmarksFilePath({ browser: "Google Chrome", app, operatingSystem: "Windows" }),
-        ).toBe(join("home", "AppData", "Local", "Google", "Chrome", "User Data", "Profile 1", "Bookmarks"));
+        expect(resolveChromiumBookmarksFilePath({ browser: "Google Chrome", app, operatingSystem: "Windows" })).toBe(
+            join("home", "AppData", "Local", "Google", "Chrome", "User Data", "Profile 1", "Bookmarks"),
+        );
     });
 });
