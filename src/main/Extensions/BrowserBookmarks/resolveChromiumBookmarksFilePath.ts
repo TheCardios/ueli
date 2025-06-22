@@ -1,6 +1,7 @@
 import type { OperatingSystem } from "@common/Core";
 import type { ChromiumBrowser } from "@common/Extensions/BrowserBookmarks";
 import type { App } from "electron";
+import { readFileSync } from "fs";
 import { join } from "path";
 
 export const resolveChromiumBookmarksFilePath = ({
@@ -14,13 +15,13 @@ export const resolveChromiumBookmarksFilePath = ({
 }): string => {
     const map: Record<ChromiumBrowser, Record<OperatingSystem, () => string>> = {
         Arc: {
-            Linux: () => "", // not supported,
-            Windows: () => join(app.getPath("home"), "AppData", "Local", "Arc", "User Data", "Default", "Bookmarks"),
-            macOS: () => join(app.getPath("appData"), "Arc", "User Data", "Default", "Bookmarks"),
+            Linux: () => "", // not supported
+            Windows: () => join(app.getPath("home"), "AppData", "Local", "Arc", "User Data"),
+            macOS: () => join(app.getPath("appData"), "Arc", "User Data"),
         },
         "Brave Browser": {
-            Linux: () => "", // not supported,
-            macOS: () => join(app.getPath("appData"), "BraveSoftware", "Brave-Browser", "Default", "Bookmarks"),
+            Linux: () => "", // not supported
+            macOS: () => join(app.getPath("appData"), "BraveSoftware", "Brave-Browser"),
             Windows: () =>
                 join(
                     app.getPath("home"),
@@ -29,25 +30,21 @@ export const resolveChromiumBookmarksFilePath = ({
                     "BraveSoftware",
                     "Brave-Browser",
                     "User Data",
-                    "Default",
-                    "Bookmarks",
                 ),
         },
         "Google Chrome": {
             Linux: () => "", // not supported
-            macOS: () => join(app.getPath("appData"), "Google", "Chrome", "Default", "Bookmarks"),
-            Windows: () =>
-                join(app.getPath("home"), "AppData", "Local", "Google", "Chrome", "User Data", "Default", "Bookmarks"),
+            macOS: () => join(app.getPath("appData"), "Google", "Chrome"),
+            Windows: () => join(app.getPath("home"), "AppData", "Local", "Google", "Chrome", "User Data"),
         },
         "Microsoft Edge": {
-            Linux: () => "", // not supported,
-            macOS: () => join(app.getPath("appData"), "Microsoft Edge", "Default", "Bookmarks"),
-            Windows: () =>
-                join(app.getPath("home"), "AppData", "Local", "Microsoft", "Edge", "User Data", "Default", "Bookmarks"),
+            Linux: () => "", // not supported
+            macOS: () => join(app.getPath("appData"), "Microsoft Edge"),
+            Windows: () => join(app.getPath("home"), "AppData", "Local", "Microsoft", "Edge", "User Data"),
         },
         "Yandex Browser": {
-            Linux: () => "", // not supported,
-            macOS: () => join(app.getPath("appData"), "Yandex", "YandexBrowser", "Default", "Bookmarks"),
+            Linux: () => "", // not supported
+            macOS: () => join(app.getPath("appData"), "Yandex", "YandexBrowser"),
             Windows: () =>
                 join(
                     app.getPath("home"),
@@ -56,11 +53,22 @@ export const resolveChromiumBookmarksFilePath = ({
                     "Yandex",
                     "YandexBrowser",
                     "User Data",
-                    "Default",
-                    "Bookmarks",
                 ),
         },
     };
 
-    return map[browser][operatingSystem]();
+    const userDataPath = map[browser][operatingSystem]();
+
+    let profile = "Default";
+
+    try {
+        const localState = JSON.parse(readFileSync(join(userDataPath, "Local State"), "utf-8"));
+        if (localState.profile && typeof localState.profile.last_used === "string") {
+            profile = localState.profile.last_used;
+        }
+    } catch (error) {
+        // ignore errors and fall back to Default profile
+    }
+
+    return join(userDataPath, profile, "Bookmarks");
 };
